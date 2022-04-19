@@ -1,13 +1,7 @@
 <template>
   <v-app>
-    <v-app-bar
-      app
-      color="primary"
-      dark
-    >
-      <div class="d-flex align-center">
-        Team Randomizer
-      </div>
+    <v-app-bar app color="primary" dark>
+      <div class="d-flex align-center text-h3">Team Randomizer</div>
 
       <v-spacer></v-spacer>
 

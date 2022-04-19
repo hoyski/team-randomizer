@@ -26,7 +26,13 @@ export default new Vuex.Store({
     ]
   },
   getters: {},
-  mutations: {},
+  mutations: {
+    ADD_TEAM(state, newTeam) {
+      let largestId = state.teams.reduce((maxFound, curTeam) => Math.max(maxFound, curTeam.id), 0);
+      newTeam.id = largestId + 1;
+      state.teams.push(newTeam);
+    }
+  },
   actions: {},
   modules: {}
 })
