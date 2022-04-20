@@ -1,11 +1,25 @@
 <template>
   <v-container class="pa-0 col-auto">
     <v-dialog v-model="showDialog" persistent max-width="600px">
-      <template v-slot:activator="{ on, attrs }">
-        <v-btn class="mx-2" fab dark color="green" v-bind="attrs" v-on="on">
-          <v-icon dark> mdi-plus </v-icon>
-        </v-btn>
+      <!-- Button that activates/displays the dialog -->
+      <template #activator="{ on: dialog }">
+        <v-tooltip bottom>
+          <template #activator="{ on: tooltip, attrs }">
+            <v-btn
+              class="mx-2"
+              fab
+              dark
+              color="green"
+              v-bind="attrs"
+              v-on="{ ...tooltip, ...dialog }"
+            >
+              <v-icon dark> mdi-plus </v-icon>
+            </v-btn>
+          </template>
+          <span>Add New Team</span>
+        </v-tooltip>
       </template>
+      <!-- The dialog itself -->
       <v-card>
         <v-card-title>
           <span class="text-h5">Add Team</span>
@@ -18,27 +32,35 @@
                   label="Team name"
                   v-model.trim="newTeam.name"
                   required
+                  :rules="[validateTeamName]"
                 />
-                <span v-if="errorText != ''" class="error">
+                <span v-if="teamErrorText != ''" class="error">
                   {{ teamErrorText }}
                 </span>
               </v-col>
             </v-row>
-            <v-row cols="24" sm="12" md="8">
-              <v-text-field
-                label="Member"
-                v-model.trim="newMember"
-                @keypress.enter="addMember"
-              />
+            <v-row>
+              <v-col cols="24" sm="12" md="8">
+                <v-text-field
+                  label="Member"
+                  hint="Enter a team member name and press Enter"
+                  persistent-hint
+                  v-model.trim="newMember"
+                  @keypress.enter="addMember"
+                />
+              </v-col>
             </v-row>
-            <v-row
-              cols="24"
-              sm="12"
-              md="8"
-              v-for="(member, idx) in newTeam.members"
-              :key="idx"
-            >
-              {{ member }}
+            <v-row>
+              <v-col cols="24" sm="12" md="8">
+                <b class="h3">Members:</b>
+              </v-col>
+            </v-row>
+            <v-row>
+              <v-col cols="24" sm="12" md="8">
+                <div v-for="(member, idx) in newTeam.members" :key="idx">
+                  {{ member }}
+                </div>
+              </v-col>
             </v-row>
           </v-container>
         </v-card-text>
@@ -84,8 +106,14 @@ export default {
       this.clearTeamAndHide();
     },
     clearTeamAndHide() {
-      this.newTeam = {};
+      this.newTeam = {
+        name: "",
+        members: [],
+      };
       this.showDialog = false;
+    },
+    validateTeamName(curVal) {
+      return curVal === "" ? "Please provide a team name" : true;
     },
   },
 };
