@@ -52,14 +52,16 @@
             </v-row>
             <v-row>
               <v-col cols="24" sm="12" md="8">
-                <b class="h3">Members:</b>
-              </v-col>
-            </v-row>
-            <v-row>
-              <v-col cols="24" sm="12" md="8">
-                <div v-for="(member, idx) in newTeam.members" :key="idx">
-                  {{ member }}
-                </div>
+                <v-list dense>
+                  <v-subheader>Members:</v-subheader>
+                  <v-list-item
+                    dense
+                    v-for="(member, idx) in newTeam.members"
+                    :key="idx"
+                  >
+                    {{ member }}
+                  </v-list-item>
+                </v-list>
               </v-col>
             </v-row>
           </v-container>
@@ -76,10 +78,19 @@
 <script>
 export default {
   name: "add-team",
+  props: {
+    editTeamId: {
+      type: Number,
+      default: -1,
+    },
+  },
   data() {
     return {
       showDialog: false,
-      newTeam: {},
+      newTeam: {
+        name: "",
+        members: [],
+      },
       newMember: "",
       teamErrorText: "",
     };
@@ -115,6 +126,9 @@ export default {
     validateTeamName(curVal) {
       return curVal === "" ? "Please provide a team name" : true;
     },
+  },
+  mounted() {
+    console.log(`In AddTeam mounted with ${this.editTeamId}`);
   },
 };
 </script>

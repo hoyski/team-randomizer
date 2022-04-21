@@ -20,7 +20,7 @@
         <v-container>
           <v-row>
             <v-spacer cols="12" />
-            <v-col col-auto> Randomize Manage </v-col>
+            <v-col col-auto><add-team :editTeamId="team.id" /></v-col>
           </v-row>
           <v-list elevation="4" rounded>
             <v-list-item
