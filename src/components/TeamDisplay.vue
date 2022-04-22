@@ -9,7 +9,7 @@
         {{ team.name }}
       </v-tab>
       <v-spacer />
-      <add-team />
+      <add-edit-team />
     </v-tabs>
     <v-tabs-items v-model="model">
       <v-tab-item
@@ -20,16 +20,36 @@
         <v-container>
           <v-row>
             <v-spacer cols="12" />
-            <v-col col-auto><add-team :editTeamId="team.id" /></v-col>
+            <v-col>
+              <v-tooltip bottom>
+                <template #activator="{on, attrs}">
+                  <v-btn
+                    class="mx-2"
+                    fab
+                    dark
+                    color="green"
+                    v-on="on"
+                    v-bind="attrs"
+                    @click="shuffleTeam(team.id)"
+                  >
+                    <v-icon>mdi-shuffle</v-icon>
+                  </v-btn>
+                </template>
+                <span>Shuffle Team Members</span>
+              </v-tooltip>
+            </v-col>
+            <v-col col-auto><add-edit-team :editTeamId="team.id" /></v-col>
           </v-row>
-          <v-list elevation="4" rounded>
-            <v-list-item
-              v-for="(member, idx) in team.members"
-              :key="idx"
-              class="elevation-4"
-            >
-              {{ member }}
-            </v-list-item>
+          <v-list>
+            <v-list-item-group elevation="1" rounded>
+              <v-list-item
+                v-for="(member, idx) in team.members"
+                :key="idx"
+                class="elevation-1 text-h2"
+              >
+                <v-list-item-content>{{ member }}</v-list-item-content>
+              </v-list-item>
+          </v-list-item-group>
           </v-list>
         </v-container>
       </v-tab-item>
@@ -38,11 +58,11 @@
 </template>
 
 <script>
-import AddTeam from "./AddTeam.vue";
+import AddEditTeam from "./AddEditTeam.vue";
 export default {
   name: "team-display",
   components: {
-    AddTeam,
+    AddEditTeam,
   },
   data() {
     return {
@@ -54,6 +74,9 @@ export default {
     addTeam() {
       alert("Adding a new team");
     },
+    shuffleTeam(id) {
+      this.$store.commit('SHUFFLE_TEAM', id);
+    }
   },
 };
 </script>

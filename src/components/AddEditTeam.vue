@@ -13,10 +13,10 @@
               v-bind="attrs"
               v-on="{ ...tooltip, ...dialog }"
             >
-              <v-icon dark> mdi-plus </v-icon>
+              <v-icon dark>{{iconToDisplay}}</v-icon>
             </v-btn>
           </template>
-          <span>Add New Team</span>
+          <span>{{buttonHelpText}}</span>
         </v-tooltip>
       </template>
       <!-- The dialog itself -->
@@ -54,30 +54,42 @@
               <v-col cols="24" sm="12" md="8">
                 <v-list dense>
                   <v-subheader>Members:</v-subheader>
-                  <v-list-item
-                    dense
-                    v-for="(member, idx) in newTeam.members"
-                    :key="idx"
-                  >
-                    {{ member }}
-                  </v-list-item>
+                  <v-list-item-group>
+                    <v-list-item
+                      dense
+                      v-for="(member, idx) in newTeam.members"
+                      :key="idx"
+                    >
+                      <v-list-item-content>{{ member }}</v-list-item-content>
+                      <v-list-item-icon>
+                        <v-icon @click="deleteMember(idx)">mdi-delete-circle</v-icon>
+                      </v-list-item-icon>
+                    </v-list-item>
+                  </v-list-item-group>
                 </v-list>
               </v-col>
             </v-row>
           </v-container>
         </v-card-text>
         <v-card-actions>
-          <v-btn color="blue darken-1" text @click="addTeam">Add</v-btn>
+          <v-btn color="blue darken-1" text @click="addUpdateTeam">{{ adding() ? 'Add' : 'Update'}}</v-btn>
           <v-btn color="blue darken-1" text @click="cancel">Cancel</v-btn>
+          <v-btn v-if="!adding()" color="blue darken-1" text @click="deleteTeam">Delete</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
+    <confirm-dialog ref="confirm"/>
   </v-container>
 </template>
 
 <script>
+import ConfirmDialog from '@/components/ConfirmDialog.vue';
+
 export default {
-  name: "add-team",
+  name: "add-edit-team",
+  components: {
+    ConfirmDialog
+  },
   props: {
     editTeamId: {
       type: Number,
@@ -95,14 +107,32 @@ export default {
       teamErrorText: "",
     };
   },
+  watch: {
+    showDialog(value) {
+      if (value) {
+        console.log(`Showing add/edit team for id ${this.editTeamId}`);
+        if (this.adding()) {
+          // Adding new team
+          this.newTeam = {
+            name: "",
+            members: [],
+          };
+        } else {
+          // Deep clone the team into newTeam. Cloned so that the dialog can be cancelled
+          let curTeam = this.$store.state.teams.find((t) => t.id === this.editTeamId);
+          this.newTeam = {id: curTeam.id, name: curTeam.name, members: []};
+          curTeam.members.forEach(m => this.newTeam.members.push(m));
+        }
+      }
+    }
+  },
   methods: {
-    addTeam() {
+    addUpdateTeam() {
       if (this.newTeam.name.length === 0) {
-        this.errorText = "Team Name is required";
         return;
       }
-      this.$store.commit("ADD_TEAM", this.newTeam);
-      this.clearTeamAndHide();
+      this.$store.commit("ADD_UPDATE_TEAM", this.newTeam);
+      this.hideDialog();
     },
     addMember() {
       if (this.newMember != "") {
@@ -113,22 +143,40 @@ export default {
         this.newMember = "";
       }
     },
-    cancel() {
-      this.clearTeamAndHide();
+    deleteMember(idx) {
+      //alert(`Deleting member at idx ${idx}`);
+      this.newTeam.members.splice(idx, 1);
     },
-    clearTeamAndHide() {
-      this.newTeam = {
-        name: "",
-        members: [],
-      };
+    async deleteTeam() {
+      if (await this.$refs.confirm.open("Confirm", `
+        Are you sure you want to delete team ${this.newTeam.name}?`)) {
+          this.$store.commit('DELETE_TEAM', this.newTeam.id);
+          this.hideDialog();
+        }
+    },
+    cancel() {
+      this.hideDialog();
+    },
+    hideDialog() {
       this.showDialog = false;
     },
     validateTeamName(curVal) {
       return curVal === "" ? "Please provide a team name" : true;
     },
+    adding() {
+      return this.editTeamId === -1;
+    }
+  },
+  computed: {
+    iconToDisplay() {
+      return (this.adding()) ? 'mdi-plus-circle' : 'mdi-cog-outline';
+    },
+    buttonHelpText() {
+      return (this.adding()) ? 'Add New Team' : 'Edit Team';
+    }
   },
   mounted() {
-    console.log(`In AddTeam mounted with ${this.editTeamId}`);
+    console.log(`In AddEditTeam mounted with ${this.editTeamId}`);
   },
 };
 </script>
