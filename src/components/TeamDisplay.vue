@@ -22,7 +22,7 @@
             <v-spacer cols="12" />
             <v-col>
               <v-tooltip bottom>
-                <template #activator="{on, attrs}">
+                <template #activator="{ on, attrs }">
                   <v-btn
                     class="mx-2"
                     fab
@@ -45,11 +45,12 @@
               <v-list-item
                 v-for="(member, idx) in team.members"
                 :key="idx"
-                class="elevation-1 text-h2"
+                class="elevation-1 text-h2 teamMember"
+                :class="'team-' + team.id"
               >
                 <v-list-item-content>{{ member }}</v-list-item-content>
               </v-list-item>
-          </v-list-item-group>
+            </v-list-item-group>
           </v-list>
         </v-container>
       </v-tab-item>
@@ -75,11 +76,17 @@ export default {
       alert("Adding a new team");
     },
     shuffleTeam(id) {
-      this.$store.commit('SHUFFLE_TEAM', id);
-    }
+      let memberDivs = document.querySelectorAll(`.teamMember.team-${id}`);
+      console.log(`Retrieved ${memberDivs.length} divs`);
+
+      //this.$store.commit("SHUFFLE_TEAM", id);
+    },
   },
 };
 </script>
 
-<style>
+<style scoped>
+.teamMember {
+  position: absolute;
+}
 </style>
