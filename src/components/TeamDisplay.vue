@@ -22,10 +22,9 @@
             <v-spacer cols="12" />
             <v-col>
               <v-tooltip bottom>
-                <template #activator="{on, attrs}">
+                <template #activator="{ on, attrs }">
                   <v-btn
                     class="mx-2"
-                    fab
                     dark
                     color="green"
                     v-on="on"
@@ -49,7 +48,7 @@
               >
                 <v-list-item-content>{{ member }}</v-list-item-content>
               </v-list-item>
-          </v-list-item-group>
+            </v-list-item-group>
           </v-list>
         </v-container>
       </v-tab-item>
@@ -75,8 +74,8 @@ export default {
       alert("Adding a new team");
     },
     shuffleTeam(id) {
-      this.$store.commit('SHUFFLE_TEAM', id);
-    }
+      this.$store.commit("SHUFFLE_TEAM", id);
+    },
   },
 };
 </script>

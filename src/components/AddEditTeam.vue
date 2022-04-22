@@ -7,16 +7,15 @@
           <template #activator="{ on: tooltip, attrs }">
             <v-btn
               class="mx-2"
-              fab
               dark
               color="green"
               v-bind="attrs"
               v-on="{ ...tooltip, ...dialog }"
             >
-              <v-icon dark>{{iconToDisplay}}</v-icon>
+              <v-icon dark>{{ iconToDisplay }}</v-icon>
             </v-btn>
           </template>
-          <span>{{buttonHelpText}}</span>
+          <span>{{ buttonHelpText }}</span>
         </v-tooltip>
       </template>
       <!-- The dialog itself -->
@@ -62,7 +61,9 @@
                     >
                       <v-list-item-content>{{ member }}</v-list-item-content>
                       <v-list-item-icon>
-                        <v-icon @click="deleteMember(idx)">mdi-delete-circle</v-icon>
+                        <v-icon @click="deleteMember(idx)"
+                          >mdi-delete-circle</v-icon
+                        >
                       </v-list-item-icon>
                     </v-list-item>
                   </v-list-item-group>
@@ -72,23 +73,27 @@
           </v-container>
         </v-card-text>
         <v-card-actions>
-          <v-btn color="blue darken-1" text @click="addUpdateTeam">{{ adding() ? 'Add' : 'Update'}}</v-btn>
+          <v-btn color="blue darken-1" text @click="addUpdateTeam">{{
+            adding() ? "Add" : "Update"
+          }}</v-btn>
           <v-btn color="blue darken-1" text @click="cancel">Cancel</v-btn>
-          <v-btn v-if="!adding()" color="blue darken-1" text @click="deleteTeam">Delete</v-btn>
+          <v-btn v-if="!adding()" color="blue darken-1" text @click="deleteTeam"
+            >Delete</v-btn
+          >
         </v-card-actions>
       </v-card>
     </v-dialog>
-    <confirm-dialog ref="confirm"/>
+    <confirm-dialog ref="confirm" />
   </v-container>
 </template>
 
 <script>
-import ConfirmDialog from '@/components/ConfirmDialog.vue';
+import ConfirmDialog from "@/components/ConfirmDialog.vue";
 
 export default {
   name: "add-edit-team",
   components: {
-    ConfirmDialog
+    ConfirmDialog,
   },
   props: {
     editTeamId: {
@@ -119,12 +124,14 @@ export default {
           };
         } else {
           // Deep clone the team into newTeam. Cloned so that the dialog can be cancelled
-          let curTeam = this.$store.state.teams.find((t) => t.id === this.editTeamId);
-          this.newTeam = {id: curTeam.id, name: curTeam.name, members: []};
-          curTeam.members.forEach(m => this.newTeam.members.push(m));
+          let curTeam = this.$store.state.teams.find(
+            (t) => t.id === this.editTeamId
+          );
+          this.newTeam = { id: curTeam.id, name: curTeam.name, members: [] };
+          curTeam.members.forEach((m) => this.newTeam.members.push(m));
         }
       }
-    }
+    },
   },
   methods: {
     addUpdateTeam() {
@@ -148,11 +155,16 @@ export default {
       this.newTeam.members.splice(idx, 1);
     },
     async deleteTeam() {
-      if (await this.$refs.confirm.open("Confirm", `
-        Are you sure you want to delete team ${this.newTeam.name}?`)) {
-          this.$store.commit('DELETE_TEAM', this.newTeam.id);
-          this.hideDialog();
-        }
+      if (
+        await this.$refs.confirm.open(
+          "Confirm",
+          `
+        Are you sure you want to delete team ${this.newTeam.name}?`
+        )
+      ) {
+        this.$store.commit("DELETE_TEAM", this.newTeam.id);
+        this.hideDialog();
+      }
     },
     cancel() {
       this.hideDialog();
@@ -165,15 +177,15 @@ export default {
     },
     adding() {
       return this.editTeamId === -1;
-    }
+    },
   },
   computed: {
     iconToDisplay() {
-      return (this.adding()) ? 'mdi-plus-circle' : 'mdi-cog-outline';
+      return this.adding() ? "mdi-plus-circle" : "mdi-cog-outline";
     },
     buttonHelpText() {
-      return (this.adding()) ? 'Add New Team' : 'Edit Team';
-    }
+      return this.adding() ? "Add New Team" : "Edit Team";
+    },
   },
   mounted() {
     console.log(`In AddEditTeam mounted with ${this.editTeamId}`);
