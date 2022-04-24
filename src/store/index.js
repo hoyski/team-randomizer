@@ -33,22 +33,6 @@ export default new Vuex.Store({
       console.log(`Deleting team with id ${id}`);
       state.teams = state.teams.filter(t => t.id != id);
       localStorage.setItem('teams', JSON.stringify(state.teams));
-    },
-    SHUFFLE_TEAM(state, id) {
-      let team = state.teams.find(t => t.id === id);
-      
-      let memberArr = [];
-      team.members.forEach(m => memberArr.push(m));
-
-      for (let i = memberArr.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [memberArr[i], memberArr[j]] = [memberArr[j], memberArr[i]];
-      }
-
-      team.members = [];
-      memberArr.forEach(m => team.members.push(m));
-      
-      localStorage.setItem('teams', JSON.stringify(state.teams));
     }
   },
   actions: {},
