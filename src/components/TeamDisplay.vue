@@ -44,7 +44,8 @@
               <v-list-item
                 v-for="(member, idx) in team.members"
                 :key="idx"
-                class="elevation-1 text-h2"
+                class="elevation-1 text-h2 teamMember"
+                :class="'team-' + team.id"
               >
                 <v-list-item-content>{{ member }}</v-list-item-content>
               </v-list-item>
@@ -66,19 +67,51 @@ export default {
   data() {
     return {
       model: {},
-      addTeamDialog: false,
+      height: 0,
     };
   },
   methods: {
-    addTeam() {
-      alert("Adding a new team");
-    },
+    // Shuffle the list items by using CSS transfrom translateY directives. A transition is
+    // applied to the transforms to animate the shuffling
     shuffleTeam(id) {
-      this.$store.commit("SHUFFLE_TEAM", id);
+      let memberDivs = document.querySelectorAll(`.teamMember.team-${id}`);
+      console.log(`Retrieved ${memberDivs.length} divs`);
+
+      if (this.height === 0 && memberDivs.length > 1) {
+        this.height =
+          memberDivs[1].getBoundingClientRect().top -
+          memberDivs[0].getBoundingClientRect().top;
+      }
+
+      // Make a deep copy of the members array and shuffle it
+      let membersCopy = [];
+      let team = this.$store.state.teams.find((t) => t.id === id);
+      team.members.forEach((m) => membersCopy.push(m));
+      for (let i = membersCopy.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [membersCopy[i], membersCopy[j]] = [membersCopy[j], membersCopy[i]];
+      }
+
+      // Figure out how many positions and in which direction each member
+      // has moved and translate the Y axis accordingly
+      for (let i = 0; i < memberDivs.length; ++i) {
+        let shufIdx = membersCopy.findIndex(
+          (m) => m === memberDivs[i].innerText
+        );
+        let transYDist = (shufIdx - i) * this.height;
+        memberDivs[i].style.transform = `translateY(${transYDist}px)`;
+      }
+
+      // Update the store to match the new order
+      // team.members = membersCopy;
+      // this.$store.commit("ADD_UPDATE_TEAM", team);
     },
   },
 };
 </script>
 
-<style>
+<style scoped>
+.teamMember {
+  transition: transform 0.75s;
+}
 </style>
