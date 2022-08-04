@@ -71,7 +71,7 @@ export default {
     };
   },
   methods: {
-    // Shuffle the list items by using CSS transfrom translateY directives. A transition is
+    // Shuffle the list items by using CSS transform translateY directives. A transition is
     // applied to the transforms to animate the shuffling
     shuffleTeam(id) {
       let memberDivs = document.querySelectorAll(`.teamMember.team-${id}`);
@@ -87,9 +87,10 @@ export default {
       let membersCopy = [];
       let team = this.$store.state.teams.find((t) => t.id === id);
       team.members.forEach((m) => membersCopy.push(m));
-      for (let i = membersCopy.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [membersCopy[i], membersCopy[j]] = [membersCopy[j], membersCopy[i]];
+      for (let i = membersCopy.length * 3; i > 0; i--) {
+        const from = Math.floor(Math.random() * membersCopy.length);
+        const to = Math.floor(Math.random() * membersCopy.length);
+        [membersCopy[from], membersCopy[to]] = [membersCopy[to], membersCopy[from]];
       }
 
       // Figure out how many positions and in which direction each member
